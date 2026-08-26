@@ -1,0 +1,313 @@
+body {
+  margin: 0;
+  padding: 34px 16px 60px;
+  background-color: #e4e5e1;
+  color: #1c1c1a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.ark {
+  max-width: 760px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border: 1px solid #c6c7c1;
+  padding: 34px 40px 30px;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 3px solid #1c1c1a;
+  padding-bottom: 12px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 27px;
+  letter-spacing: -0.4px;
+}
+
+.stempel {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  color: #6f7168;
+  white-space: nowrap;
+}
+
+section {
+  margin-top: 30px;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+.nr {
+  font-family: Consolas, "Courier New", monospace;
+  color: #b8571c;
+  margin-right: 8px;
+}
+
+.rader {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  margin: 0;
+}
+
+.rader dt {
+  padding: 7px 0;
+  border-bottom: 1px dotted #c2c3bc;
+  color: #6f7168;
+}
+
+.rader dd {
+  margin: 0;
+  padding: 7px 0;
+  border-bottom: 1px dotted #c2c3bc;
+  font-family: Consolas, "Courier New", monospace;
+  word-break: break-word;
+}
+
+.kropp {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 32px;
+  margin-top: 30px;
+}
+
+.rail {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.rail figure {
+  margin: 0;
+}
+
+.vis {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid #c6c7c1;
+  background: none;
+  cursor: zoom-in;
+}
+
+.rail img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  aspect-ratio: 16 / 10;
+}
+
+.portrett img {
+  aspect-ratio: 4 / 5;
+}
+
+.rail figcaption {
+  margin-top: 5px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  color: #6f7168;
+}
+
+main section:first-child {
+  margin-top: 0;
+}
+
+a {
+  color: #b8571c;
+}
+
+a:hover,
+a:focus {
+  color: #8c3f12;
+}
+
+.skrivefelt {
+  display: flex;
+  align-items: center;
+  border: 1px solid #9b9c94;
+}
+
+.skrivefelt:focus-within {
+  border-color: #b8571c;
+}
+
+#hilsen-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+#teller {
+  padding-right: 12px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  color: #9b9c94;
+}
+
+#teller.naer-grensa {
+  color: #b8571c;
+}
+
+#feilmelding {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #a33a22;
+  min-height: 16px;
+}
+
+.tom {
+  margin: 10px 0 0;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  color: #9b9c94;
+}
+
+.logg {
+  list-style: none;
+  counter-reset: hilsen;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.logg li {
+  counter-increment: hilsen;
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px dotted #c2c3bc;
+}
+
+.logg li::before {
+  content: counter(hilsen, decimal-leading-zero);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  color: #b8571c;
+}
+
+.logg .tekst {
+  word-break: break-word;
+}
+
+.logg .tid {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  color: #9b9c94;
+  white-space: nowrap;
+}
+
+footer {
+  margin-top: 30px;
+  border-top: 1px solid #c6c7c1;
+  padding-top: 12px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  color: #6f7168;
+}
+
+footer b {
+  font-weight: normal;
+  color: #1c1c1a;
+}
+
+#visning {
+  padding: 0;
+  border: 1px solid #9b9c94;
+  background-color: #ffffff;
+  max-width: 92vw;
+}
+
+#visning::backdrop {
+  background-color: rgba(28, 28, 26, 0.82);
+}
+
+#visning img {
+  display: block;
+  max-width: 92vw;
+  max-height: 80vh;
+}
+
+#visning p {
+  margin: 0;
+  padding: 8px 12px;
+  border-top: 1px solid #c6c7c1;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  color: #6f7168;
+}
+
+@media (max-width: 620px) {
+  .ark {
+    padding: 24px 20px;
+  }
+
+  header {
+    display: block;
+  }
+
+  .stempel {
+    display: block;
+    margin-top: 4px;
+  }
+
+  .kropp {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .rail {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rail img,
+  .portrett img {
+    aspect-ratio: 4 / 3;
+  }
+
+  .rader {
+    grid-template-columns: 1fr;
+  }
+
+  .rader dt {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .logg li {
+    grid-template-columns: 26px 1fr;
+  }
+
+  .logg .tid {
+    grid-column: 2;
+  }
+}
+
+@media print {
+  body {
+    padding: 0;
+    background-color: #ffffff;
+  }
+
+  .ark {
+    max-width: none;
+    border: none;
+    padding: 0;
+  }
+
+  .skrivefelt,
+  #feilmelding {
+    display: none;
+  }
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Presentasjonsside for Jan Nazar Havdal, elev i 2INF.">
+    <title>Jan Nazar Havdal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="ark">
+
+        <header>
+            <h1>Jan Nazar Havdal</h1>
+            <span class="stempel">2INF &middot; GVS</span>
+        </header>
+
+        <div class="kropp">
+
+            <aside class="rail">
+                <figure class="portrett">
+                    <button type="button" class="vis">
+                        <img src="{{ url_for('static', filename='img/23.jpg') }}" alt="Bie med løvehode">
+                    </button>
+                    <figcaption>Jan Nazar, {{ alder }} år</figcaption>
+                </figure>
+                <figure>
+                    <button type="button" class="vis">
+                        <img src="{{ url_for('static', filename='img/drone35.jpg') }}" alt="3,5-tommeren min">
+                    </button>
+                    <figcaption>3,5" &ndash; oransje deler</figcaption>
+                </figure>
+                <figure>
+                    <button type="button" class="vis">
+                        <img src="{{ url_for('static', filename='img/drone.jpg') }}" alt="5-tommeren min">
+                    </button>
+                    <figcaption>5" &ndash; den jeg flyr mest</figcaption>
+                </figure>
+                <figure>
+                    <button type="button" class="vis">
+                        <img src="{{ url_for('static', filename='img/desk.jpg') }}" alt="Plassen jeg bygger på">
+                    </button>
+                    <figcaption>Plassen jeg bygger på</figcaption>
+                </figure>
+            </aside>
+
+            <main>
+
+                <section>
+                    <h2><span class="nr">01</span> Kontakt</h2>
+                    <dl class="rader">
+                        <dt>Telefon</dt>
+                        <dd>+47 46 95 05 47</dd>
+                        <dt>E-post</dt>
+                        <dd>nazoli19@innlandetfylke.no</dd>
+                        <dt>Fødselsdag</dt>
+                        <dd>{{ fodselsdag }}</dd>
+                        <dt>Nettsider</dt>
+                        <dd>
+                            <a href="https://jannazar.xyz">jannazar.xyz</a><br>
+                            <a href="https://klondaik.uk">klondaik.uk</a>
+                        </dd>
+                    </dl>
+                </section>
+
+                <section>
+                    <h2><span class="nr">02</span> Interesser</h2>
+                    <dl class="rader">
+                        <dt>FPV</dt>
+                        <dd>Bygger, lodder og flyr egne droner</dd>
+                        <dt>Maskinvare</dt>
+                        <dd>Setter sammen og trimmer PC-er</dd>
+                        <dt>Koding</dt>
+                        <dd>Småprosjekter med ESP32 og Python</dd>
+                    </dl>
+                </section>
+
+                <section>
+                    <h2><span class="nr">03</span> Gjestebok</h2>
+
+                    <div class="skrivefelt">
+                        <input type="text" id="hilsen-input" maxlength="{{ maks }}" autocomplete="off"
+                            placeholder="Skriv noe og trykk Enter" aria-label="Skriv en hilsen">
+                        <span id="teller">0/{{ maks }}</span>
+                    </div>
+                    <p id="feilmelding" role="status"></p>
+
+                    <p class="tom" id="tom-melding" {% if hilsener %}hidden{% endif %}>Ingen hilsener enda.</p>
+
+                    <ol class="logg" id="hilsen-liste">
+                        {% for h in hilsener %}
+                        <li>
+                            <span class="tekst">{{ h.tekst }}</span>
+                            <span class="tid">{{ h.tidspunkt }}</span>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </section>
+
+            </main>
+
+        </div>
+
+        <footer>
+            hilsener <b id="antall">{{ '%02d'|format(antall) }}</b>
+            &middot; <a href="/api/hilsener">/api/hilsener</a>
+        </footer>
+
+    </div>
+
+    <dialog id="visning">
+        <img id="visning-bilde" src="" alt="">
+        <p id="visning-tekst"></p>
+    </dialog>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
