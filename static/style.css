@@ -3,7 +3,7 @@ body {
   padding: 34px 16px 60px;
   background-color: #e4e5e1;
   color: #1c1c1a;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Cambria, Cochin, Georgia, Times New Roman, serif;
   font-size: 14px;
 }
 
@@ -31,7 +31,7 @@ h1 {
 }
 
 .stempel {
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   color: #6f7168;
   white-space: nowrap;
@@ -47,7 +47,7 @@ h2 {
 }
 
 .nr {
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   color: #b8571c;
   margin-right: 8px;
 }
@@ -68,7 +68,7 @@ h2 {
   margin: 0;
   padding: 7px 0;
   border-bottom: 1px dotted #c2c3bc;
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   word-break: break-word;
 }
 
@@ -111,7 +111,7 @@ h2 {
 
 .rail figcaption {
   margin-top: 5px;
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   color: #6f7168;
 }
@@ -150,7 +150,7 @@ a:focus {
 
 #teller {
   padding-right: 12px;
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   color: #9b9c94;
 }
@@ -168,7 +168,7 @@ a:focus {
 
 .tom {
   margin: 10px 0 0;
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   color: #9b9c94;
 }
@@ -192,7 +192,7 @@ a:focus {
 
 .logg li::before {
   content: counter(hilsen, decimal-leading-zero);
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   color: #b8571c;
 }
@@ -202,7 +202,7 @@ a:focus {
 }
 
 .logg .tid {
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   color: #9b9c94;
   white-space: nowrap;
@@ -212,7 +212,7 @@ footer {
   margin-top: 30px;
   border-top: 1px solid #c6c7c1;
   padding-top: 12px;
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   color: #6f7168;
 }
@@ -243,7 +243,7 @@ footer b {
   margin: 0;
   padding: 8px 12px;
   border-top: 1px solid #c6c7c1;
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   color: #6f7168;
 }

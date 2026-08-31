@@ -38,7 +38,6 @@ def hent_alle():
     kobling.close()
     return [dict(rad) for rad in rader]
 
-
 def regn_alder(fodt):
     i_dag = date.today()
     alder = i_dag.year - fodt.year
