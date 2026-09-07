@@ -47,6 +47,11 @@ h1 {
 .logg .tid,
 .handlinger button,
 #avbryt-svar,
+.lenkeknapp,
+.krev,
+.skjema label,
+.skjemafeil,
+.skjemalenker,
 .rediger-hjelp,
 #teller,
 #feilmelding,
@@ -62,6 +67,16 @@ footer,
 
 section {
   margin-top: 30px;
+}
+
+.topp {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.topp form {
+  margin: 0;
 }
 
 h2 {
@@ -209,6 +224,74 @@ a {
   color: var(--svak);
 }
 
+.krev {
+  margin: 0;
+  color: var(--svak);
+}
+
+.skjemaside {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.skjemaside img {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--strek);
+}
+
+.skjema {
+  display: grid;
+  gap: 6px;
+  max-width: 320px;
+}
+
+.skjema label {
+  color: var(--svak);
+}
+
+.skjema input {
+  padding: 10px 12px;
+  border: 1px solid var(--strek);
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.skjema input:focus {
+  border-color: var(--aksent);
+}
+
+.skjema button {
+  justify-self: start;
+  padding: 9px 18px;
+  border: 1px solid var(--aksent);
+  background: none;
+  color: var(--aksent);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.skjema button:hover,
+.skjema button:focus {
+  background-color: var(--aksent);
+  color: var(--ark);
+}
+
+.skjemafeil {
+  margin: 0;
+  min-height: 16px;
+  color: var(--feil);
+}
+
+.skjemalenker {
+  margin: 20px 0 0;
+  color: var(--svak);
+}
+
 .logg {
   list-style: none;
   counter-reset: hilsen;
@@ -275,7 +358,8 @@ a {
 }
 
 .handlinger button,
-#avbryt-svar {
+#avbryt-svar,
+.lenkeknapp {
   padding: 0;
   border: none;
   background: none;
@@ -287,7 +371,9 @@ a {
 .handlinger button:hover,
 .handlinger button:focus,
 #avbryt-svar:hover,
-#avbryt-svar:focus {
+#avbryt-svar:focus,
+.lenkeknapp:hover,
+.lenkeknapp:focus {
   color: var(--aksent);
 }
 
@@ -352,9 +438,14 @@ footer b {
     display: block;
   }
 
-  .stempel {
+  header > .stempel {
     display: block;
     margin-top: 4px;
+  }
+
+  .topp {
+    flex-wrap: wrap;
+    margin-top: 6px;
   }
 
   .kropp {
@@ -373,6 +464,11 @@ footer b {
 
   .rader {
     grid-template-columns: 1fr;
+  }
+
+  .skjemaside {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .rader dt {

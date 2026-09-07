@@ -18,7 +18,18 @@
 
         <header>
             <h1>Jan Nazar Havdal</h1>
-            <span class="stempel">2INF &middot; GVS</span>
+            <div class="topp">
+                <span class="stempel">2INF &middot; GVS</span>
+                {% if bruker %}
+                <span class="stempel">{{ bruker.brukernavn }}</span>
+                <form method="post" action="/logg-ut">
+                    <button type="submit" class="lenkeknapp">Logg ut</button>
+                </form>
+                {% else %}
+                <a href="/logg-inn">Logg inn</a>
+                <a href="/registrer">Registrer deg</a>
+                {% endif %}
+            </div>
         </header>
 
         <div class="kropp">
@@ -84,6 +95,7 @@
                 <section>
                     <h2><span class="nr">03</span> Gjestebok</h2>
 
+                    {% if bruker %}
                     <p class="svarer" id="svarer" hidden>
                         Svarer på <span id="svarer-tekst"></span>
                         <button type="button" id="avbryt-svar">Avbryt</button>
@@ -95,6 +107,12 @@
                         <span id="teller">0/{{ maks }}</span>
                     </div>
                     <p id="feilmelding" role="status"></p>
+                    {% else %}
+                    <p class="krev">
+                        <a href="/logg-inn">Logg inn</a> eller <a href="/registrer">registrer deg</a>
+                        for å skrive en hilsen.
+                    </p>
+                    {% endif %}
 
                     <p class="tom" id="tom-melding" {% if hilsener %}hidden{% endif %}>Ingen hilsener enda.</p>
 
@@ -109,13 +127,17 @@
                                 {% if h.endret %}
                                 <span class="endret" title="Endret {{ h.endret }}">endret</span>
                                 {% endif %}
+                                {% if bruker %}
                                 <span class="handlinger">
                                     <button type="button" data-handling="svar">Svar</button>
+                                    {% if h.bruker_id == bruker.id %}
                                     <button type="button" data-handling="rediger">Rediger</button>
                                     <button type="button" data-handling="slett">Slett</button>
+                                    {% endif %}
                                 </span>
+                                {% endif %}
                             </div>
-                            <span class="tid">{{ h.tidspunkt }}</span>
+                            <span class="tid">{% if h.navn %}{{ h.navn }} &middot; {% endif %}{{ h.tidspunkt }}</span>
                         </li>
                         {% endfor %}
                     </ol>

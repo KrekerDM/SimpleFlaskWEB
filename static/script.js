@@ -7,7 +7,7 @@ const antallUt = document.getElementById("antall");
 const svarLinje = document.getElementById("svarer");
 const svarTekst = document.getElementById("svarer-tekst");
 const avbrytKnapp = document.getElementById("avbryt-svar");
-const maks = felt.maxLength;
+const maks = felt ? felt.maxLength : 0;
 
 let sender = false;
 let svarerTil = null;
@@ -63,7 +63,7 @@ function lagRad(hilsen) {
   innhold.appendChild(handlinger);
 
   rad.appendChild(innhold);
-  rad.appendChild(lag("span", "tid", hilsen.tidspunkt));
+  rad.appendChild(lag("span", "tid", hilsen.navn + " · " + hilsen.tidspunkt));
   return rad;
 }
 
@@ -224,66 +224,72 @@ async function slett(rad) {
   }
 }
 
-liste.addEventListener("click", function (e) {
-  const knapp = e.target.closest("button[data-handling]");
-  if (!knapp) {
-    return;
-  }
-
-  const rad = knapp.closest("li");
-  if (knapp.dataset.handling === "svar") {
-    startSvar(rad);
-  } else if (knapp.dataset.handling === "rediger") {
-    startRediger(rad);
-  } else {
-    slett(rad);
-  }
-});
-
-avbrytKnapp.addEventListener("click", function () {
-  stoppSvar();
-  felt.focus();
-});
-
-felt.addEventListener("input", function () {
-  teller.textContent = felt.value.length + "/" + maks;
-  teller.classList.toggle("naer-grensa", felt.value.length > maks - 20);
-  feilmelding.textContent = "";
-});
-
-felt.addEventListener("keydown", async function (e) {
-  if (e.key === "Escape") {
-    stoppSvar();
-    return;
-  }
-
-  const tekst = felt.value.trim();
-  if (e.key !== "Enter" || sender || tekst === "") {
-    return;
-  }
-
-  sender = true;
-
-  try {
-    const svar = await send("/hilsen", "POST", { tekst: tekst, svar_til: svarerTil });
-
-    if (!svar.ok) {
-      feilmelding.textContent = svar.data.feil;
+function wireGjestebok() {
+  liste.addEventListener("click", function (e) {
+    const knapp = e.target.closest("button[data-handling]");
+    if (!knapp) {
       return;
     }
 
-    liste.insertBefore(lagRad(svar.data), liste.firstChild);
-    settAntall(svar.data.antall);
+    const rad = knapp.closest("li");
+    if (knapp.dataset.handling === "svar") {
+      startSvar(rad);
+    } else if (knapp.dataset.handling === "rediger") {
+      startRediger(rad);
+    } else {
+      slett(rad);
+    }
+  });
+
+  avbrytKnapp.addEventListener("click", function () {
     stoppSvar();
-    felt.value = "";
-    teller.textContent = "0/" + maks;
-    teller.classList.remove("naer-grensa");
-  } catch (error) {
-    feilmelding.textContent = "Fikk ikke kontakt med serveren.";
-  } finally {
-    sender = false;
-  }
-});
+    felt.focus();
+  });
+
+  felt.addEventListener("input", function () {
+    teller.textContent = felt.value.length + "/" + maks;
+    teller.classList.toggle("naer-grensa", felt.value.length > maks - 20);
+    feilmelding.textContent = "";
+  });
+
+  felt.addEventListener("keydown", async function (e) {
+    if (e.key === "Escape") {
+      stoppSvar();
+      return;
+    }
+
+    const tekst = felt.value.trim();
+    if (e.key !== "Enter" || sender || tekst === "") {
+      return;
+    }
+
+    sender = true;
+
+    try {
+      const svar = await send("/hilsen", "POST", { tekst: tekst, svar_til: svarerTil });
+
+      if (!svar.ok) {
+        feilmelding.textContent = svar.data.feil;
+        return;
+      }
+
+      liste.insertBefore(lagRad(svar.data), liste.firstChild);
+      settAntall(svar.data.antall);
+      stoppSvar();
+      felt.value = "";
+      teller.textContent = "0/" + maks;
+      teller.classList.remove("naer-grensa");
+    } catch (error) {
+      feilmelding.textContent = "Fikk ikke kontakt med serveren.";
+    } finally {
+      sender = false;
+    }
+  });
+}
+
+if (felt) {
+  wireGjestebok();
+}
 
 const visning = document.getElementById("visning");
 const visningBilde = document.getElementById("visning-bilde");
