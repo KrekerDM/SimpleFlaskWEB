@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Presentasjonsside for Jan Nazar Havdal, elev i 2INF.">
     <title>Jan Nazar Havdal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -81,6 +84,11 @@
                 <section>
                     <h2><span class="nr">03</span> Gjestebok</h2>
 
+                    <p class="svarer" id="svarer" hidden>
+                        Svarer på <span id="svarer-tekst"></span>
+                        <button type="button" id="avbryt-svar">Avbryt</button>
+                    </p>
+
                     <div class="skrivefelt">
                         <input type="text" id="hilsen-input" maxlength="{{ maks }}" autocomplete="off"
                             placeholder="Skriv noe og trykk Enter" aria-label="Skriv en hilsen">
@@ -92,8 +100,21 @@
 
                     <ol class="logg" id="hilsen-liste">
                         {% for h in hilsener %}
-                        <li>
-                            <span class="tekst">{{ h.tekst }}</span>
+                        <li data-id="{{ h.id }}">
+                            <div class="innhold">
+                                {% if h.svar_kort %}
+                                <span class="sitat" data-svar-til="{{ h.svar_til }}">Svar til: {{ h.svar_kort }}</span>
+                                {% endif %}
+                                <span class="tekst">{{ h.tekst }}</span>
+                                {% if h.endret %}
+                                <span class="endret" title="Endret {{ h.endret }}">endret</span>
+                                {% endif %}
+                                <span class="handlinger">
+                                    <button type="button" data-handling="svar">Svar</button>
+                                    <button type="button" data-handling="rediger">Rediger</button>
+                                    <button type="button" data-handling="slett">Slett</button>
+                                </span>
+                            </div>
                             <span class="tid">{{ h.tidspunkt }}</span>
                         </li>
                         {% endfor %}

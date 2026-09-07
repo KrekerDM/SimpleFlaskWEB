@@ -1,17 +1,27 @@
+:root {
+  --bakgrunn: #eeeeec;
+  --ark: #ffffff;
+  --tekst: #1c1c1a;
+  --svak: #8a8b85;
+  --strek: #dcdcd8;
+  --aksent: #b8571c;
+  --feil: #a33a22;
+}
+
 body {
   margin: 0;
   padding: 34px 16px 60px;
-  background-color: #e4e5e1;
-  color: #1c1c1a;
-  font-family: cursive;
+  background-color: var(--bakgrunn);
+  color: var(--tekst);
+  font-family: "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 14px;
 }
 
 .ark {
   max-width: 760px;
   margin: 0 auto;
-  background-color: #ffffff;
-  border: 1px solid #c6c7c1;
+  background-color: var(--ark);
+  border: 1px solid var(--strek);
   padding: 34px 40px 30px;
 }
 
@@ -20,20 +30,33 @@ header {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  border-bottom: 3px solid #1c1c1a;
-  padding-bottom: 12px;
+  border-bottom: 1px solid var(--strek);
+  padding-bottom: 14px;
 }
 
 h1 {
   margin: 0;
-  font-size: 27px;
-  letter-spacing: -0.4px;
+  font-size: 26px;
+}
+
+.stempel,
+.rail figcaption,
+.tom,
+.sitat,
+.endret,
+.logg .tid,
+.handlinger button,
+#avbryt-svar,
+.rediger-hjelp,
+#teller,
+#feilmelding,
+footer,
+#visning p {
+  font-size: 12px;
 }
 
 .stempel {
-  font-family: cursive;
-  font-size: 12px;
-  color: #6f7168;
+  color: var(--svak);
   white-space: nowrap;
 }
 
@@ -47,9 +70,8 @@ h2 {
 }
 
 .nr {
-  font-family: cursive;
-  color: #b8571c;
   margin-right: 8px;
+  color: var(--svak);
 }
 
 .rader {
@@ -58,17 +80,18 @@ h2 {
   margin: 0;
 }
 
+.rader dt,
+.rader dd {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--strek);
+}
+
 .rader dt {
-  padding: 7px 0;
-  border-bottom: 1px dotted #c2c3bc;
-  color: #6f7168;
+  color: var(--svak);
 }
 
 .rader dd {
   margin: 0;
-  padding: 7px 0;
-  border-bottom: 1px dotted #c2c3bc;
-  font-family: cursive;
   word-break: break-word;
 }
 
@@ -93,7 +116,7 @@ h2 {
   display: block;
   width: 100%;
   padding: 0;
-  border: 1px solid #c6c7c1;
+  border: 1px solid var(--strek);
   background: none;
   cursor: zoom-in;
 }
@@ -110,10 +133,8 @@ h2 {
 }
 
 .rail figcaption {
-  margin-top: 5px;
-  font-family: cursive;
-  font-size: 11px;
-  color: #6f7168;
+  margin-top: 6px;
+  color: var(--svak);
 }
 
 main section:first-child {
@@ -121,56 +142,71 @@ main section:first-child {
 }
 
 a {
-  color: #b8571c;
+  color: var(--aksent);
 }
 
-a:hover,
-a:focus {
-  color: #8c3f12;
+.svarer {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--strek);
+  border-bottom: none;
+  color: var(--svak);
+}
+
+.svarer[hidden] {
+  display: none;
+}
+
+#svarer-tekst {
+  flex: 1;
+  min-width: 0;
+  color: var(--tekst);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .skrivefelt {
   display: flex;
   align-items: center;
-  border: 1px solid #9b9c94;
+  border: 1px solid var(--strek);
 }
 
 .skrivefelt:focus-within {
-  border-color: #b8571c;
+  border-color: var(--aksent);
 }
 
 #hilsen-input {
   flex: 1;
+  min-width: 0;
   border: none;
   outline: none;
   padding: 10px 12px;
-  font-family: cursive;
+  font-family: inherit;
   font-size: 14px;
 }
 
 #teller {
   padding-right: 12px;
-  font-family: cursive;
-  font-size: 12px;
-  color: #9b9c94;
+  color: var(--svak);
 }
 
 #teller.naer-grensa {
-  color: #b8571c;
+  color: var(--aksent);
 }
 
 #feilmelding {
   margin: 6px 0 0;
-  font-size: 13px;
-  color: #a33a22;
   min-height: 16px;
+  color: var(--feil);
 }
 
 .tom {
   margin: 10px 0 0;
-  font-family: cursive;
-  font-size: 12px;
-  color: #9b9c94;
+  color: var(--svak);
 }
 
 .logg {
@@ -186,46 +222,107 @@ a:focus {
   grid-template-columns: 34px 1fr auto;
   gap: 10px;
   align-items: baseline;
-  padding: 9px 0;
-  border-bottom: 1px dotted #c2c3bc;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--strek);
 }
 
 .logg li::before {
   content: counter(hilsen, decimal-leading-zero);
-  font-family: cursive;
   font-size: 12px;
-  color: #b8571c;
+  color: var(--svak);
+}
+
+.innhold {
+  min-width: 0;
 }
 
 .logg .tekst {
   word-break: break-word;
 }
 
+.logg .tid,
+.endret,
+.sitat,
+.rediger-hjelp {
+  color: var(--svak);
+}
+
 .logg .tid {
-  font-family: cursive;
-  font-size: 11px;
-  color: #9b9c94;
   white-space: nowrap;
+}
+
+.sitat {
+  display: block;
+  margin-bottom: 4px;
+  padding-left: 8px;
+  border-left: 2px solid var(--strek);
+  word-break: break-word;
+}
+
+.endret {
+  margin-left: 6px;
+  cursor: help;
+}
+
+.handlinger {
+  display: flex;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.handlinger[hidden] {
+  display: none;
+}
+
+.handlinger button,
+#avbryt-svar {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: var(--svak);
+  cursor: pointer;
+}
+
+.handlinger button:hover,
+.handlinger button:focus,
+#avbryt-svar:hover,
+#avbryt-svar:focus {
+  color: var(--aksent);
+}
+
+.rediger-felt {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--aksent);
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.rediger-hjelp {
+  display: block;
+  margin-top: 4px;
 }
 
 footer {
   margin-top: 30px;
-  border-top: 1px solid #c6c7c1;
-  padding-top: 12px;
-  font-family: cursive;
-  font-size: 12px;
-  color: #6f7168;
+  border-top: 1px solid var(--strek);
+  padding-top: 14px;
+  color: var(--svak);
 }
 
 footer b {
   font-weight: normal;
-  color: #1c1c1a;
+  color: var(--tekst);
 }
 
 #visning {
   padding: 0;
-  border: 1px solid #9b9c94;
-  background-color: #ffffff;
+  border: 1px solid var(--strek);
+  background-color: var(--ark);
   max-width: 92vw;
 }
 
@@ -242,10 +339,8 @@ footer b {
 #visning p {
   margin: 0;
   padding: 8px 12px;
-  border-top: 1px solid #c6c7c1;
-  font-family: cursive;
-  font-size: 11px;
-  color: #6f7168;
+  border-top: 1px solid var(--strek);
+  color: var(--svak);
 }
 
 @media (max-width: 620px) {
@@ -292,12 +387,16 @@ footer b {
   .logg .tid {
     grid-column: 2;
   }
+
+  .handlinger {
+    gap: 18px;
+  }
 }
 
 @media print {
   body {
     padding: 0;
-    background-color: #ffffff;
+    background-color: var(--ark);
   }
 
   .ark {
@@ -307,7 +406,9 @@ footer b {
   }
 
   .skrivefelt,
-  #feilmelding {
+  #feilmelding,
+  .svarer,
+  .handlinger {
     display: none;
   }
 }
