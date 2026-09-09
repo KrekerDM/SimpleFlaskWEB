@@ -1,0 +1,14 @@
+<div class="topp">
+    <span class="stempel">2INF &middot; GVS</span>
+    <a href="/">Forsiden</a>
+    <a href="/sok">Søk</a>
+    {% if bruker %}
+    <span class="stempel">{{ bruker.brukernavn }}</span>
+    <form method="post" action="/logg-ut">
+        <button type="submit" class="lenkeknapp">Logg ut</button>
+    </form>
+    {% else %}
+    <a href="/logg-inn">Logg inn</a>
+    <a href="/registrer">Registrer deg</a>
+    {% endif %}
+</div>

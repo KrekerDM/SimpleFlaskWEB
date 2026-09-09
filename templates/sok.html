@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block tittel %}Søk &middot; Jan Nazar Havdal{% endblock %}
+{% block overskrift %}Søk{% endblock %}
+
+{% block innhold %}
+
+<section>
+
+    <form class="sokefelt" method="get" action="/sok">
+        <input type="search" name="ord" value="{{ sokeord }}" maxlength="{{ maks }}" autocomplete="off"
+            placeholder="Skriv et ord fra en hilsen" aria-label="Søk i hilsener" autofocus>
+        <button type="submit">Søk</button>
+    </form>
+
+    {% if feil %}
+    <p class="skjemafeil" role="status">{{ feil }}</p>
+    {% elif treff %}
+    <p class="sokinfo">{{ treff|length }} treff på «{{ sokeord }}»</p>
+    {% elif sokeord %}
+    <p class="sokinfo">Ingen hilsener inneholder «{{ sokeord }}»</p>
+    {% endif %}
+
+    <ol class="logg">
+        {% for h in treff %}
+        {% set svarskjema = true %}
+        {% include 'hilsen.html' %}
+        {% endfor %}
+    </ol>
+
+</section>
+
+{% endblock %}

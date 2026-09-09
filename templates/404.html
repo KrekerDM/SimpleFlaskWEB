@@ -1,32 +1,14 @@
-<!DOCTYPE html>
-<html lang="no">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mistet signal &middot; Jan Nazar Havdal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block tittel %}Mistet signal &middot; Jan Nazar Havdal{% endblock %}
+{% block overskrift %}Mistet signal{% endblock %}
+{% block stempel %}<span class="stempel">FEIL 404</span>{% endblock %}
 
-<body>
+{% block innhold %}
 
-    <div class="ark">
+<section>
+    <p>Denne siden finnes ikke. Enten er adressen skrevet feil, eller så fløy du for langt unna.</p>
+    <p><a href="/">Forsiden</a></p>
+</section>
 
-        <header>
-            <h1>Mistet signal</h1>
-            <span class="stempel">FEIL 404</span>
-        </header>
-
-        <section>
-            <p>Denne siden finnes ikke. Enten er adressen skrevet feil, eller så fløy du for langt unna.</p>
-            <p><a href="/">Tilbake til forsiden</a></p>
-        </section>
-
-    </div>
-
-</body>
-
-</html>
+{% endblock %}

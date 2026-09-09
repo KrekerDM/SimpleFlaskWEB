@@ -1,0 +1,28 @@
+<li data-id="{{ h.id }}">
+    <div class="innhold">
+        {% if h.svar_kort %}
+        <span class="sitat" data-svar-til="{{ h.svar_til }}">Svar til: {{ h.svar_kort }}</span>
+        {% endif %}
+        <span class="tekst">{{ h.tekst }}</span>
+        {% if h.endret %}
+        <span class="endret" title="Endret {{ h.endret }}">endret</span>
+        {% endif %}
+        {% if bruker and svarskjema %}
+        <form class="svarskjema" method="post" action="/svar/{{ h.id }}">
+            <input type="hidden" name="ord" value="{{ sokeord }}">
+            <input type="text" name="tekst" maxlength="{{ maks }}" autocomplete="off" placeholder="Skriv et svar"
+                aria-label="Svar på denne hilsenen">
+            <button type="submit">Svar</button>
+        </form>
+        {% elif bruker %}
+        <span class="handlinger">
+            <button type="button" data-handling="svar">Svar</button>
+            {% if h.bruker_id == bruker.id %}
+            <button type="button" data-handling="rediger">Rediger</button>
+            <button type="button" data-handling="slett">Slett</button>
+            {% endif %}
+        </span>
+        {% endif %}
+    </div>
+    <span class="tid">{% if h.navn %}{{ h.navn }} &middot; {% endif %}{{ h.tidspunkt }}</span>
+</li>

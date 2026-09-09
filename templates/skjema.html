@@ -1,54 +1,36 @@
-<!DOCTYPE html>
-<html lang="no">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ tittel }} &middot; Jan Nazar Havdal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block tittel %}{{ tittel }} &middot; Jan Nazar Havdal{% endblock %}
+{% block overskrift %}{{ tittel }}{% endblock %}
+{% block stempel %}<span class="stempel">Gjestebok</span>{% endblock %}
 
-<body>
+{% block innhold %}
 
-    <div class="ark">
+<section class="skjemaside">
 
-        <header>
-            <h1>{{ tittel }}</h1>
-            <span class="stempel">Gjestebok</span>
-        </header>
+    <img src="{{ url_for('static', filename='img/' + bilde) }}" alt="{{ bilde_tekst }}">
 
-        <section class="skjemaside">
+    <div>
+        <form class="skjema" method="post" action="{{ handling }}">
+            <label for="brukernavn">Brukernavn</label>
+            <input type="text" id="brukernavn" name="brukernavn" maxlength="20" autocomplete="username" autofocus
+                required>
 
-            <img src="{{ url_for('static', filename='img/' + bilde) }}" alt="{{ bilde_tekst }}">
+            <label for="passord">Passord</label>
+            <input type="password" id="passord" name="passord" autocomplete="current-password" required>
 
-            <div>
-                <form class="skjema" method="post" action="{{ handling }}">
-                    <label for="brukernavn">Brukernavn</label>
-                    <input type="text" id="brukernavn" name="brukernavn" maxlength="20" autocomplete="username"
-                        autofocus required>
+            <p class="skjemafeil" role="status">{{ feil if feil }}</p>
 
-                    <label for="passord">Passord</label>
-                    <input type="password" id="passord" name="passord" autocomplete="current-password" required>
+            <button type="submit">{{ knapp }}</button>
+        </form>
 
-                    <p class="skjemafeil" role="status">{{ feil if feil }}</p>
-
-                    <button type="submit">{{ knapp }}</button>
-                </form>
-
-                <p class="skjemalenker">
-                    <a href="{{ annen_url }}">{{ annen_tekst }}</a>
-                    &middot;
-                    <a href="/">Tilbake til forsiden</a>
-                </p>
-            </div>
-
-        </section>
-
+        <p class="skjemalenker">
+            <a href="{{ annen_url }}">{{ annen_tekst }}</a>
+            &middot;
+            <a href="/">Forsiden</a>
+        </p>
     </div>
 
-</body>
+</section>
 
-</html>
+{% endblock %}

@@ -1,5 +1,9 @@
 Første gang: `pip install flask pycryptodome`. Deretter `python app.py`, så ligger siden på <http://127.0.0.1:5000>.
 `app.py` er serveren, `index.html` er siden, `skjema.html` er innlogging og registrering, `style.css` er utseendet og `script.js` sender hilsenen.
+Alle sidene arver fra `base.html` med `extends`, så hodet med skrift og stilark står bare ett sted, og hver side fyller inn blokkene `tittel`, `overskrift` og `innhold`.
+En hilsen tegnes av `hilsen.html`, som både forsiden og søkesida henter inn, så en hilsen ser like ut begge steder.
+I mappa `deler` ligger de to modulene serveren bygger på: `database.py` gjør alt mot SQLite, og `sikkerhet.py` tar seg av AES, passord og innloggingskaka.
+`app.py` importerer begge og inneholder bare rutene, altså hva som skal skje på hver adresse.
 `skjema.html` brukes til begge skjemaene, og hvilken tittel, knapp og bilde som skal stå der hentes fra `SKJEMAER` i `app.py`.
 
 Oppgave 1: navn, telefon, e-post, fødselsdag og interesser står til høyre, bildet av meg til venstre
@@ -27,6 +31,12 @@ Navnet ditt står ved hilsenene dine, du kan svare på alle, men bare endre og s
 Klikker du på et bilde åpnes det i full størrelse, og du lukker det med Esc.
 Skriver du feil adresse får du min egen 404-side i stedet for feilsiden til Flask.
 Nederst ligger `/api/hilsener` som viser alle hilsenene som JSON.
+
+Øverst på hver side ligger lenka Søk. Der skriver du et ord i feltet, og `sok_i_hilsener` går gjennom alle hilsenene og tar med de som har ordet i seg.
+Den leter etter ordet hvor som helst i teksten, ikke bare i starten, så søk på `dag` finner også «Gratulerer med dagen».
+Store og små bokstaver spiller ingen rolle, fordi jeg gjør begge deler om til små bokstaver med `lower()` først.
+Under hvert treff ligger et lite skjema, så du kan svare med en gang. Svaret lagres med `svar_til` som peker på hilsenen du svarte på, og du kommer tilbake til samme søk etterpå.
+Toppmenyen ligger i `topp.html` og hentes inn i både `index.html` og `sok.html` med `include`, så den står bare ett sted.
 Siden ser ut som et databladark fordi jeg driver med FPV, og alle dronedeler kommer med et sånt ark.
 Skrifta er Inter.
 

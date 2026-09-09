@@ -49,6 +49,7 @@ h1 {
 #avbryt-svar,
 .lenkeknapp,
 .krev,
+.sokinfo,
 .skjema label,
 .skjemafeil,
 .skjemalenker,
@@ -194,14 +195,33 @@ a {
   border-color: var(--aksent);
 }
 
-#hilsen-input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  outline: none;
+#hilsen-input,
+.skjema input,
+.sokefelt input,
+.svarskjema input,
+.rediger-felt {
   padding: 10px 12px;
+  border: 1px solid var(--strek);
+  outline: none;
   font-family: inherit;
   font-size: 14px;
+}
+
+#hilsen-input,
+.sokefelt input,
+.svarskjema input {
+  flex: 1;
+  min-width: 0;
+}
+
+#hilsen-input {
+  border: none;
+}
+
+.skjema input:focus,
+.sokefelt input:focus,
+.svarskjema input:focus {
+  border-color: var(--aksent);
 }
 
 #teller {
@@ -252,19 +272,24 @@ a {
   color: var(--svak);
 }
 
-.skjema input {
-  padding: 10px 12px;
-  border: 1px solid var(--strek);
-  outline: none;
-  font-family: inherit;
-  font-size: 14px;
+.sokefelt,
+.svarskjema {
+  display: flex;
+  gap: 10px;
 }
 
-.skjema input:focus {
-  border-color: var(--aksent);
+.svarskjema {
+  margin-top: 8px;
 }
 
-.skjema button {
+.sokinfo {
+  margin: 14px 0 0;
+  color: var(--svak);
+}
+
+.skjema button,
+.sokefelt button,
+.svarskjema button {
   justify-self: start;
   padding: 9px 18px;
   border: 1px solid var(--aksent);
@@ -275,8 +300,17 @@ a {
   cursor: pointer;
 }
 
+.svarskjema button {
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
 .skjema button:hover,
-.skjema button:focus {
+.skjema button:focus,
+.sokefelt button:hover,
+.sokefelt button:focus,
+.svarskjema button:hover,
+.svarskjema button:focus {
   background-color: var(--aksent);
   color: var(--ark);
 }
@@ -381,11 +415,7 @@ a {
   width: 100%;
   box-sizing: border-box;
   margin-top: 4px;
-  padding: 8px 10px;
-  border: 1px solid var(--aksent);
-  outline: none;
-  font-family: inherit;
-  font-size: 14px;
+  border-color: var(--aksent);
 }
 
 .rediger-hjelp {
