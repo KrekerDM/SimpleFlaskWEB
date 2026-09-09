@@ -1,6 +1,5 @@
 :root {
-  --bakgrunn: #eeeeec;
-  --ark: #ffffff;
+  --bakgrunn: #ffffff;
   --tekst: #1c1c1a;
   --svak: #8a8b85;
   --strek: #dcdcd8;
@@ -10,19 +9,16 @@
 
 body {
   margin: 0;
-  padding: 34px 16px 60px;
+  padding: 40px 20px 60px;
   background-color: var(--bakgrunn);
   color: var(--tekst);
-  font-family: "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: "Roboto Slab", Georgia, "Times New Roman", serif;
   font-size: 14px;
 }
 
 .ark {
   max-width: 760px;
   margin: 0 auto;
-  background-color: var(--ark);
-  border: 1px solid var(--strek);
-  padding: 34px 40px 30px;
 }
 
 header {
@@ -312,7 +308,7 @@ a {
 .svarskjema button:hover,
 .svarskjema button:focus {
   background-color: var(--aksent);
-  color: var(--ark);
+  color: var(--bakgrunn);
 }
 
 .skjemafeil {
@@ -438,7 +434,7 @@ footer b {
 #visning {
   padding: 0;
   border: 1px solid var(--strek);
-  background-color: var(--ark);
+  background-color: var(--bakgrunn);
   max-width: 92vw;
 }
 
@@ -460,10 +456,6 @@ footer b {
 }
 
 @media (max-width: 620px) {
-  .ark {
-    padding: 24px 20px;
-  }
-
   header {
     display: block;
   }
@@ -522,13 +514,10 @@ footer b {
 @media print {
   body {
     padding: 0;
-    background-color: var(--ark);
   }
 
   .ark {
     max-width: none;
-    border: none;
-    padding: 0;
   }
 
   .skrivefelt,

@@ -38,6 +38,6 @@ Store og små bokstaver spiller ingen rolle, fordi jeg gjør begge deler om til 
 Under hvert treff ligger et lite skjema, så du kan svare med en gang. Svaret lagres med `svar_til` som peker på hilsenen du svarte på, og du kommer tilbake til samme søk etterpå.
 Toppmenyen ligger i `topp.html` og hentes inn i både `index.html` og `sok.html` med `include`, så den står bare ett sted.
 Siden ser ut som et databladark fordi jeg driver med FPV, og alle dronedeler kommer med et sånt ark.
-Skrifta er Inter.
+Skrifta er Roboto Slab.
 
 Jeg spurte KI om hvordan `fetch` sender JSON, forskjellen på `textContent` og `innerHTML`, hva `<dialog>` er, hvordan `PUT` og `DELETE` fungerer i Flask, og hvorfor passord skal hashes og ikke krypteres. Resten er fra w3schools.
