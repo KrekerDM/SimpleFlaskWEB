@@ -14,6 +14,7 @@ SPORRING = """
 """
 
 KONTAKTFELT = ('fornavn', 'etternavn', 'by', 'epost', 'telefon')
+BOLK = 500
 
 
 def koble():
@@ -60,6 +61,11 @@ def lag_tabell():
         kobling.execute('ALTER TABLE hilsener ADD COLUMN bruker_id INTEGER')
     kobling.commit()
     kobling.close()
+
+
+def del_opp(liste):
+    for start in range(0, len(liste), BOLK):
+        yield liste[start:start + BOLK]
 
 
 def naa():
@@ -116,17 +122,19 @@ def slett_traad(kobling, hilsen_id, bruker_id):
         for rad in kobling.execute('SELECT id FROM hilsener WHERE svar_til = ?', (forelder,)):
             ider.append(rad['id'])
 
-    plasser = ','.join('?' for _ in ider)
-    egne = [rad['id'] for rad in kobling.execute(
-        f'SELECT id FROM hilsener WHERE id IN ({plasser}) AND bruker_id = ?', ider + [bruker_id]
-    )]
+    egne = []
+    for bolk in del_opp(ider):
+        plasser = ','.join('?' for _ in bolk)
+        egne.extend(rad['id'] for rad in kobling.execute(
+            f'SELECT id FROM hilsener WHERE id IN ({plasser}) AND bruker_id = ?', bolk + [bruker_id]
+        ))
 
-    if egne:
-        egne_plasser = ','.join('?' for _ in egne)
-        kobling.execute(f'UPDATE hilsener SET svar_til = NULL WHERE svar_til IN ({egne_plasser})', egne)
-        kobling.execute(f'DELETE FROM hilsener WHERE id IN ({egne_plasser})', egne)
-        kobling.commit()
+    for bolk in del_opp(egne):
+        plasser = ','.join('?' for _ in bolk)
+        kobling.execute(f'UPDATE hilsener SET svar_til = NULL WHERE svar_til IN ({plasser})', bolk)
+        kobling.execute(f'DELETE FROM hilsener WHERE id IN ({plasser})', bolk)
 
+    kobling.commit()
     return egne
 
 

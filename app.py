@@ -35,12 +35,27 @@ SKJEMAER = {
 }
 
 
+def les_json():
+    try:
+        data = flask.request.get_json(silent=True)
+    except RecursionError:
+        data = None
+    return data if isinstance(data, dict) else {}
+
+
 def les_tekst(data):
     tekst = str(data.get('tekst', '')).strip()
+
     if not tekst:
         return None, 'Du må skrive noe først.'
     if len(tekst) > MAKS_LENGDE:
         return None, f'Hilsenen kan ikke være lengre enn {MAKS_LENGDE} tegn.'
+
+    try:
+        tekst.encode('utf-8')
+    except UnicodeEncodeError:
+        return None, 'Teksten inneholder tegn serveren ikke kan lagre.'
+
     return tekst, None
 
 
@@ -220,6 +235,7 @@ def registrer():
     if bruker is None:
         return vis_skjema('registrer', 'Brukernavnet er opptatt.'), 400
 
+    flask.session.pop('csrf', None)
     flask_login.login_user(bruker)
     return flask.redirect(sikkerhet.trygg_neste())
 
@@ -236,6 +252,7 @@ def logg_inn():
     if bruker is None:
         return vis_skjema('logg-inn', 'Feil brukernavn eller passord.'), 401
 
+    flask.session.pop('csrf', None)
     flask_login.login_user(bruker)
     return flask.redirect(sikkerhet.trygg_neste())
 
@@ -250,7 +267,7 @@ def logg_ut():
 @app.route('/hilsen', methods=['POST'])
 @flask_login.login_required
 def ny_hilsen():
-    data = flask.request.get_json(silent=True) or {}
+    data = les_json()
     tekst, feil = les_tekst(data)
     if feil:
         return flask.jsonify({'feil': feil}), 400
@@ -277,7 +294,7 @@ def ny_hilsen():
 @app.route('/hilsen/<int:hilsen_id>', methods=['PUT'])
 @flask_login.login_required
 def endre_hilsen(hilsen_id):
-    data = flask.request.get_json(silent=True) or {}
+    data = les_json()
     tekst, feil = les_tekst(data)
     if feil:
         return flask.jsonify({'feil': feil}), 400

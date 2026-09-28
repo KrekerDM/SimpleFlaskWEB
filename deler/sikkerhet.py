@@ -85,8 +85,10 @@ def sjekk_csrf():
 
 def trygg_neste():
     neste = flask.request.args.get('next', '')
-    if neste.startswith('/') and not neste.startswith('//'):
+
+    if neste.startswith('/') and not neste.startswith('//') and neste.isprintable():
         return neste
+
     return '/'
 
 
