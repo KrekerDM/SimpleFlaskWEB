@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block tittel %}{{ kontakt.fornavn }} {{ kontakt.etternavn }} &middot; Jan Nazar Havdal{% endblock %}
+{% block overskrift %}{{ kontakt.fornavn }} {{ kontakt.etternavn }}{% endblock %}
+
+{% block innhold %}
+
+<section class="skjemaside">
+
+    {% if kontakt.bilde %}
+    <img src="{{ url_for('static', filename='img/kontakter/' + kontakt.bilde) }}"
+        alt="Bilde av {{ kontakt.fornavn }} {{ kontakt.etternavn }}">
+    {% else %}
+    <p class="tom">Ingen bilde lagt inn.</p>
+    {% endif %}
+
+    <div>
+        <dl class="rader">
+            <dt>Fornavn</dt>
+            <dd>{{ kontakt.fornavn }}</dd>
+            <dt>Etternavn</dt>
+            <dd>{{ kontakt.etternavn }}</dd>
+            <dt>By</dt>
+            <dd>{{ kontakt.by }}</dd>
+            <dt>E-post</dt>
+            <dd><a href="mailto:{{ kontakt.epost }}">{{ kontakt.epost }}</a></dd>
+            <dt>Telefon</dt>
+            <dd>{{ kontakt.telefon }}</dd>
+        </dl>
+
+        <p class="skjemalenker">
+            {% if current_user.is_authenticated %}
+            <a href="/kontakter/{{ kontakt.id }}/endre">Endre</a>
+            &middot;
+            {% endif %}
+            <a href="/kontakter">Alle kontakter</a>
+        </p>
+    </div>
+
+</section>
+
+{% endblock %}

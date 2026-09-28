@@ -2,10 +2,13 @@ import re
 from datetime import date
 
 import flask
+import flask_login
 
-from deler import database, sikkerhet
+from deler import database, kontakter, sikkerhet
 
 app = flask.Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = kontakter.MAKS_BILDE + 64 * 1024
+sikkerhet.koble_til_app(app)
 
 MAKS_LENGDE = 200
 MIN_PASSORD = 8
@@ -49,13 +52,13 @@ def regn_alder(fodt):
     return alder
 
 
-def finn_egen_hilsen(kobling, hilsen_id, bruker, handling):
+def finn_egen_hilsen(kobling, hilsen_id, handling):
     hilsen = database.hent_en(kobling, hilsen_id)
 
     if hilsen is None:
         return None, (flask.jsonify({'feil': 'Fant ikke hilsenen.'}), 404)
 
-    if hilsen['bruker_id'] != bruker['id']:
+    if hilsen['bruker_id'] != flask_login.current_user.id:
         return None, (flask.jsonify({'feil': f'Du kan bare {handling} dine egne hilsener.'}), 403)
 
     return hilsen, None
@@ -66,7 +69,6 @@ def vis_sok(sokeord, feil=None):
         'sok.html',
         sokeord=sokeord,
         treff=database.sok_i_hilsener(sokeord) if sokeord else [],
-        bruker=sikkerhet.hent_bruker(),
         maks=MAKS_LENGDE,
         feil=feil,
     )
@@ -78,6 +80,12 @@ def vis_skjema(navn, feil=None):
     )
 
 
+def vis_kontaktskjema(tittel, kontakt, feil=None):
+    return flask.render_template(
+        'kontaktskjema.html', tittel=tittel, kontakt=kontakt, felter=kontakter.FELTER, feil=feil
+    )
+
+
 @app.route('/')
 def forside():
     hilsener = database.hent_alle()
@@ -86,7 +94,6 @@ def forside():
         hilsener=hilsener,
         antall=len(hilsener),
         maks=MAKS_LENGDE,
-        bruker=sikkerhet.hent_bruker(),
         fodselsdag=FODSELSDAG.strftime('%d.%m.%Y'),
         alder=regn_alder(FODSELSDAG),
     )
@@ -98,18 +105,86 @@ def api():
     return flask.jsonify({'antall': len(hilsener), 'hilsener': hilsener})
 
 
+@app.route('/kontakter')
+def kontaktliste():
+    return flask.render_template('kontakter.html', kontakter=database.hent_kontakter())
+
+
+@app.route('/kontakter/<int:kontakt_id>')
+def kontaktdetaljer(kontakt_id):
+    kontakt = database.hent_kontakt(kontakt_id)
+    if kontakt is None:
+        flask.abort(404)
+    return flask.render_template('kontakt.html', kontakt=kontakt)
+
+
+@app.route('/kontakter/ny', methods=['GET', 'POST'])
+@flask_login.login_required
+def ny_kontakt():
+    if flask.request.method == 'GET':
+        return vis_kontaktskjema('Ny kontakt', {})
+
+    felter, feil = kontakter.les_felter(flask.request.form)
+    if feil:
+        return vis_kontaktskjema('Ny kontakt', flask.request.form, feil), 400
+
+    filnavn, feil = kontakter.lagre_bilde(flask.request.files.get('bilde'))
+    if feil:
+        return vis_kontaktskjema('Ny kontakt', flask.request.form, feil), 400
+
+    kontakt_id = database.lagre_kontakt(felter, filnavn)
+    return flask.redirect(flask.url_for('kontaktdetaljer', kontakt_id=kontakt_id))
+
+
+@app.route('/kontakter/<int:kontakt_id>/endre', methods=['GET', 'POST'])
+@flask_login.login_required
+def endre_kontakt(kontakt_id):
+    kontakt = database.hent_kontakt(kontakt_id)
+    if kontakt is None:
+        flask.abort(404)
+
+    if flask.request.method == 'GET':
+        return vis_kontaktskjema('Endre kontakt', kontakt)
+
+    felter, feil = kontakter.les_felter(flask.request.form)
+    if feil:
+        return vis_kontaktskjema('Endre kontakt', flask.request.form, feil), 400
+
+    filnavn, feil = kontakter.lagre_bilde(flask.request.files.get('bilde'))
+    if feil:
+        return vis_kontaktskjema('Endre kontakt', flask.request.form, feil), 400
+
+    database.endre_kontakt(kontakt_id, felter)
+
+    if filnavn:
+        database.sett_bilde(kontakt_id, filnavn)
+        kontakter.slett_bilde(kontakt['bilde'])
+
+    return flask.redirect(flask.url_for('kontaktdetaljer', kontakt_id=kontakt_id))
+
+
+@app.route('/kontakter/<int:kontakt_id>/slett', methods=['POST'])
+@flask_login.login_required
+def slett_kontakt(kontakt_id):
+    kontakt = database.hent_kontakt(kontakt_id)
+    if kontakt is None:
+        flask.abort(404)
+
+    database.slett_kontakt(kontakt_id)
+    kontakter.slett_bilde(kontakt['bilde'])
+
+    return flask.redirect('/kontakter')
+
+
 @app.route('/sok')
 def sok():
     return vis_sok(flask.request.args.get('ord', '').strip())
 
 
 @app.route('/svar/<int:hilsen_id>', methods=['POST'])
+@flask_login.login_required
 def svar_pa(hilsen_id):
     sokeord = flask.request.form.get('ord', '').strip()
-    bruker = sikkerhet.hent_bruker()
-
-    if bruker is None:
-        return vis_sok(sokeord, 'Du må logge inn for å svare.'), 401
 
     tekst, feil = les_tekst(flask.request.form)
     if feil:
@@ -121,7 +196,7 @@ def svar_pa(hilsen_id):
         kobling.close()
         return vis_sok(sokeord, 'Fant ikke hilsenen.'), 404
 
-    database.lagre_hilsen(kobling, tekst, hilsen_id, bruker['id'])
+    database.lagre_hilsen(kobling, tekst, hilsen_id, flask_login.current_user.id)
     kobling.close()
 
     return flask.redirect(flask.url_for('sok', ord=sokeord))
@@ -141,11 +216,12 @@ def registrer():
     if len(passord) < MIN_PASSORD:
         return vis_skjema('registrer', f'Passordet må ha minst {MIN_PASSORD} tegn.'), 400
 
-    bruker_id = sikkerhet.lag_bruker(brukernavn, passord)
-    if bruker_id is None:
+    bruker = sikkerhet.lag_bruker(brukernavn, passord)
+    if bruker is None:
         return vis_skjema('registrer', 'Brukernavnet er opptatt.'), 400
 
-    return sikkerhet.logg_inn_svar(bruker_id)
+    flask_login.login_user(bruker)
+    return flask.redirect(sikkerhet.trygg_neste())
 
 
 @app.route('/logg-inn', methods=['GET', 'POST'])
@@ -156,24 +232,24 @@ def logg_inn():
     brukernavn = flask.request.form.get('brukernavn', '').strip()
     passord = flask.request.form.get('passord', '')
 
-    bruker_id = sikkerhet.sjekk_innlogging(brukernavn, passord)
-    if bruker_id is None:
+    bruker = sikkerhet.sjekk_innlogging(brukernavn, passord)
+    if bruker is None:
         return vis_skjema('logg-inn', 'Feil brukernavn eller passord.'), 401
 
-    return sikkerhet.logg_inn_svar(bruker_id)
+    flask_login.login_user(bruker)
+    return flask.redirect(sikkerhet.trygg_neste())
 
 
 @app.route('/logg-ut', methods=['POST'])
+@flask_login.login_required
 def logg_ut():
-    return sikkerhet.logg_ut_svar()
+    flask_login.logout_user()
+    return flask.redirect('/')
 
 
 @app.route('/hilsen', methods=['POST'])
+@flask_login.login_required
 def ny_hilsen():
-    bruker = sikkerhet.hent_bruker()
-    if bruker is None:
-        return flask.jsonify({'feil': 'Du må logge inn for å skrive.'}), 401
-
     data = flask.request.get_json(silent=True) or {}
     tekst, feil = les_tekst(data)
     if feil:
@@ -190,7 +266,7 @@ def ny_hilsen():
         kobling.close()
         return flask.jsonify({'feil': 'Hilsenen du svarte på finnes ikke lenger.'}), 404
 
-    ny_id = database.lagre_hilsen(kobling, tekst, svar_til, bruker['id'])
+    ny_id = database.lagre_hilsen(kobling, tekst, svar_til, flask_login.current_user.id)
     hilsen = database.hent_en(kobling, ny_id)
     hilsen['antall'] = database.tell(kobling)
     kobling.close()
@@ -199,18 +275,15 @@ def ny_hilsen():
 
 
 @app.route('/hilsen/<int:hilsen_id>', methods=['PUT'])
+@flask_login.login_required
 def endre_hilsen(hilsen_id):
-    bruker = sikkerhet.hent_bruker()
-    if bruker is None:
-        return flask.jsonify({'feil': 'Du må logge inn for å endre.'}), 401
-
     data = flask.request.get_json(silent=True) or {}
     tekst, feil = les_tekst(data)
     if feil:
         return flask.jsonify({'feil': feil}), 400
 
     kobling = database.koble()
-    hilsen, feilsvar = finn_egen_hilsen(kobling, hilsen_id, bruker, 'endre')
+    hilsen, feilsvar = finn_egen_hilsen(kobling, hilsen_id, 'endre')
 
     if feilsvar:
         kobling.close()
@@ -225,19 +298,16 @@ def endre_hilsen(hilsen_id):
 
 
 @app.route('/hilsen/<int:hilsen_id>', methods=['DELETE'])
+@flask_login.login_required
 def slett_hilsen(hilsen_id):
-    bruker = sikkerhet.hent_bruker()
-    if bruker is None:
-        return flask.jsonify({'feil': 'Du må logge inn for å slette.'}), 401
-
     kobling = database.koble()
-    hilsen, feilsvar = finn_egen_hilsen(kobling, hilsen_id, bruker, 'slette')
+    hilsen, feilsvar = finn_egen_hilsen(kobling, hilsen_id, 'slette')
 
     if feilsvar:
         kobling.close()
         return feilsvar
 
-    ider = database.slett_traad(kobling, hilsen_id)
+    ider = database.slett_traad(kobling, hilsen_id, flask_login.current_user.id)
     antall = database.tell(kobling)
     kobling.close()
 
@@ -247,8 +317,13 @@ def slett_hilsen(hilsen_id):
 @app.errorhandler(404)
 def ikke_funnet(feil):
     if flask.request.path.startswith('/api/') or flask.request.method != 'GET':
-        return flask.jsonify({'feil': 'Fant ikke hilsenen.'}), 404
+        return flask.jsonify({'feil': 'Fant ikke siden.'}), 404
     return flask.render_template('404.html'), 404
+
+
+@app.errorhandler(413)
+def for_stor(feil):
+    return flask.jsonify({'feil': 'Filen er for stor. Bildet kan være maks 2 MB.'}), 413
 
 
 database.lag_tabell()

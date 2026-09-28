@@ -1,18 +1,27 @@
-import base64
 import hashlib
 import hmac
 import os
+import secrets
 import sqlite3
 
 import flask
-from Crypto.Cipher import AES
+import flask_login
 
 from deler import database
 
 NOKKEL_FIL = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'nokkel.bin')
 RUNDER = 200000
-KAKE = 'innlogging'
-KAKE_DAGER = 7
+TOM_SALT = '00' * 16
+
+login_manager = flask_login.LoginManager()
+login_manager.login_view = 'logg_inn'
+login_manager.login_message = 'Du må logge inn for å gjøre dette.'
+
+
+class Bruker(flask_login.UserMixin):
+    def __init__(self, id, brukernavn):
+        self.id = id
+        self.brukernavn = brukernavn
 
 
 def hent_nokkel():
@@ -23,23 +32,62 @@ def hent_nokkel():
         return fil.read()
 
 
-NOKKEL = hent_nokkel()
+def koble_til_app(app):
+    app.secret_key = hent_nokkel()
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.jinja_env.globals['csrf_token'] = csrf_token
+    app.before_request(sjekk_csrf)
+    app.after_request(sett_hoder)
+    login_manager.init_app(app)
 
 
-def krypter(tekst):
-    nonce = os.urandom(12)
-    chiffer = AES.new(NOKKEL, AES.MODE_GCM, nonce=nonce)
-    innhold, merke = chiffer.encrypt_and_digest(tekst.encode())
-    return base64.urlsafe_b64encode(nonce + merke + innhold).decode()
+def sett_hoder(svar):
+    svar.headers['X-Content-Type-Options'] = 'nosniff'
+    svar.headers['X-Frame-Options'] = 'DENY'
+    svar.headers['Referrer-Policy'] = 'same-origin'
+    return svar
 
 
-def dekrypter(kake):
+@login_manager.user_loader
+def last_bruker(bruker_id):
     try:
-        raa = base64.urlsafe_b64decode(kake)
-        chiffer = AES.new(NOKKEL, AES.MODE_GCM, nonce=raa[:12])
-        return chiffer.decrypt_and_verify(raa[28:], raa[12:28]).decode()
-    except (ValueError, KeyError):
+        bruker_id = int(bruker_id)
+    except (TypeError, ValueError):
         return None
+
+    kobling = database.koble()
+    rad = kobling.execute(
+        'SELECT id, brukernavn FROM brukere WHERE id = ?', (bruker_id,)
+    ).fetchone()
+    kobling.close()
+    return Bruker(rad['id'], rad['brukernavn']) if rad else None
+
+
+def csrf_token():
+    if 'csrf' not in flask.session:
+        flask.session['csrf'] = secrets.token_urlsafe(32)
+    return flask.session['csrf']
+
+
+def sjekk_csrf():
+    if flask.request.method in ('GET', 'HEAD', 'OPTIONS'):
+        return None
+
+    lagret = flask.session.get('csrf', '')
+    sendt = flask.request.form.get('csrf') or flask.request.headers.get('X-CSRF-Token', '')
+
+    if lagret and sendt and hmac.compare_digest(lagret, sendt):
+        return None
+
+    return flask.jsonify({'feil': 'Skjemaet var utgått. Last siden på nytt og prøv igjen.'}), 400
+
+
+def trygg_neste():
+    neste = flask.request.args.get('next', '')
+    if neste.startswith('/') and not neste.startswith('//'):
+        return neste
+    return '/'
 
 
 def hash_passord(passord, salt):
@@ -56,7 +104,7 @@ def lag_bruker(brukernavn, passord):
             (brukernavn, salt, hash_passord(passord, salt), database.naa()),
         )
         kobling.commit()
-        return markor.lastrowid
+        return Bruker(markor.lastrowid, brukernavn)
     except sqlite3.IntegrityError:
         return None
     finally:
@@ -66,45 +114,15 @@ def lag_bruker(brukernavn, passord):
 def sjekk_innlogging(brukernavn, passord):
     kobling = database.koble()
     rad = kobling.execute(
-        'SELECT id, salt, passord FROM brukere WHERE brukernavn = ?', (brukernavn,)
+        'SELECT id, brukernavn, salt, passord FROM brukere WHERE brukernavn = ?', (brukernavn,)
     ).fetchone()
     kobling.close()
 
-    if rad is None or not hmac.compare_digest(rad['passord'], hash_passord(passord, rad['salt'])):
-        return None
-    return rad['id']
-
-
-def hent_bruker():
-    kake = flask.request.cookies.get(KAKE)
-    if not kake:
+    if rad is None:
+        hash_passord(passord, TOM_SALT)
         return None
 
-    id_tekst = dekrypter(kake)
-    if not id_tekst or not id_tekst.isdigit():
+    if not hmac.compare_digest(rad['passord'], hash_passord(passord, rad['salt'])):
         return None
 
-    kobling = database.koble()
-    rad = kobling.execute(
-        'SELECT id, brukernavn FROM brukere WHERE id = ?', (int(id_tekst),)
-    ).fetchone()
-    kobling.close()
-    return dict(rad) if rad else None
-
-
-def logg_inn_svar(bruker_id):
-    svar = flask.redirect('/')
-    svar.set_cookie(
-        KAKE,
-        krypter(str(bruker_id)),
-        max_age=KAKE_DAGER * 24 * 60 * 60,
-        httponly=True,
-        samesite='Lax',
-    )
-    return svar
-
-
-def logg_ut_svar():
-    svar = flask.redirect('/')
-    svar.delete_cookie(KAKE)
-    return svar
+    return Bruker(rad['id'], rad['brukernavn'])

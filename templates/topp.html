@@ -1,10 +1,12 @@
 <div class="topp">
     <span class="stempel">2INF &middot; GVS</span>
     <a href="/">Forsiden</a>
+    <a href="/kontakter">Kontakter</a>
     <a href="/sok">Søk</a>
-    {% if bruker %}
-    <span class="stempel">{{ bruker.brukernavn }}</span>
+    {% if current_user.is_authenticated %}
+    <span class="stempel">{{ current_user.brukernavn }}</span>
     <form method="post" action="/logg-ut">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
         <button type="submit" class="lenkeknapp">Logg ut</button>
     </form>
     {% else %}

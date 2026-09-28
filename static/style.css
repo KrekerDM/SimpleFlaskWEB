@@ -192,7 +192,8 @@ a {
 }
 
 #hilsen-input,
-.skjema input,
+.skjema input[type="text"],
+.skjema input[type="password"],
 .sokefelt input,
 .svarskjema input,
 .rediger-felt {
@@ -214,7 +215,13 @@ a {
   border: none;
 }
 
-.skjema input:focus,
+.skjema input[type="file"] {
+  padding: 8px 10px;
+  color: var(--svak);
+}
+
+.skjema input[type="text"]:focus,
+.skjema input[type="password"]:focus,
 .sokefelt input:focus,
 .svarskjema input:focus {
   border-color: var(--aksent);
@@ -327,6 +334,14 @@ a {
   counter-reset: hilsen;
   margin: 6px 0 0;
   padding: 0;
+}
+
+.kontaktliste .handlinger {
+  align-items: baseline;
+}
+
+.kontaktliste .handlinger form {
+  margin: 0;
 }
 
 .logg li {

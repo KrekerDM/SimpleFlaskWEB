@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block tittel %}{{ tittel }} &middot; Jan Nazar Havdal{% endblock %}
+{% block overskrift %}{{ tittel }}{% endblock %}
+
+{% block innhold %}
+
+<section>
+
+    <form class="skjema" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+
+        {% for navn, merkelapp, lengde in felter %}
+        <label for="{{ navn }}">{{ merkelapp }}</label>
+        <input type="text" id="{{ navn }}" name="{{ navn }}" maxlength="{{ lengde }}" autocomplete="off"
+            value="{{ kontakt[navn] if kontakt[navn] }}" required>
+        {% endfor %}
+
+        <label for="bilde">Bilde</label>
+        <input type="file" id="bilde" name="bilde" accept="image/jpeg,image/png,image/gif,image/webp">
+
+        <p class="skjemafeil" role="status">{{ feil if feil }}</p>
+
+        <button type="submit">Lagre</button>
+    </form>
+
+    <p class="skjemalenker">
+        {% if kontakt.id %}
+        <a href="/kontakter/{{ kontakt.id }}">Avbryt</a>
+        {% else %}
+        <a href="/kontakter">Avbryt</a>
+        {% endif %}
+    </p>
+
+</section>
+
+{% endblock %}

@@ -13,10 +13,18 @@ let sender = false;
 let svarerTil = null;
 let redigerer = null;
 
+const merke = document.querySelector('meta[name="csrf"]');
+
 async function send(url, metode, kropp) {
+  const hoder = { "X-CSRF-Token": merke ? merke.content : "" };
+
+  if (kropp) {
+    hoder["Content-Type"] = "application/json";
+  }
+
   const svar = await fetch(url, {
     method: metode,
-    headers: kropp ? { "Content-Type": "application/json" } : {},
+    headers: hoder,
     body: kropp ? JSON.stringify(kropp) : null,
   });
   return { ok: svar.ok, data: await svar.json() };
@@ -187,11 +195,7 @@ function startRediger(rad) {
 
 async function slett(rad) {
   const id = Number(rad.dataset.id);
-  const sporsmal = finnSvar(id).length > 0
-    ? "Slette hilsenen og svarene på den?"
-    : "Slette denne hilsenen?";
-
-  if (!window.confirm(sporsmal)) {
+  if (!window.confirm("Slette denne hilsenen?")) {
     return;
   }
 
@@ -292,21 +296,32 @@ if (felt) {
 }
 
 const visning = document.getElementById("visning");
-const visningBilde = document.getElementById("visning-bilde");
-const visningTekst = document.getElementById("visning-tekst");
 
-document.querySelectorAll(".vis").forEach(function (knapp) {
-  knapp.addEventListener("click", function () {
-    const bilde = knapp.querySelector("img");
-    visningBilde.src = bilde.src;
-    visningBilde.alt = bilde.alt;
-    visningTekst.textContent = knapp.closest("figure").querySelector("figcaption").textContent;
-    visning.showModal();
+if (visning) {
+  const visningBilde = document.getElementById("visning-bilde");
+  const visningTekst = document.getElementById("visning-tekst");
+
+  document.querySelectorAll(".vis").forEach(function (knapp) {
+    knapp.addEventListener("click", function () {
+      const bilde = knapp.querySelector("img");
+      visningBilde.src = bilde.src;
+      visningBilde.alt = bilde.alt;
+      visningTekst.textContent = knapp.closest("figure").querySelector("figcaption").textContent;
+      visning.showModal();
+    });
   });
-});
 
-visning.addEventListener("click", function (e) {
-  if (e.target === visning) {
-    visning.close();
-  }
+  visning.addEventListener("click", function (e) {
+    if (e.target === visning) {
+      visning.close();
+    }
+  });
+}
+
+document.querySelectorAll("form[data-bekreft]").forEach(function (skjema) {
+  skjema.addEventListener("submit", function (e) {
+    if (!window.confirm(skjema.dataset.bekreft)) {
+      e.preventDefault();
+    }
+  });
 });

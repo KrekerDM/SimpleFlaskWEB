@@ -65,7 +65,7 @@
         <section>
             <h2><span class="nr">03</span> Gjestebok</h2>
 
-            {% if bruker %}
+            {% if current_user.is_authenticated %}
             <p class="svarer" id="svarer" hidden>
                 Svarer på <span id="svarer-tekst"></span>
                 <button type="button" id="avbryt-svar">Avbryt</button>
@@ -110,5 +110,4 @@
     <p id="visning-tekst"></p>
 </dialog>
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}

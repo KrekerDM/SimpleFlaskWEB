@@ -7,17 +7,18 @@
         {% if h.endret %}
         <span class="endret" title="Endret {{ h.endret }}">endret</span>
         {% endif %}
-        {% if bruker and svarskjema %}
+        {% if current_user.is_authenticated and svarskjema %}
         <form class="svarskjema" method="post" action="/svar/{{ h.id }}">
+            <input type="hidden" name="csrf" value="{{ csrf_token() }}">
             <input type="hidden" name="ord" value="{{ sokeord }}">
             <input type="text" name="tekst" maxlength="{{ maks }}" autocomplete="off" placeholder="Skriv et svar"
                 aria-label="Svar på denne hilsenen">
             <button type="submit">Svar</button>
         </form>
-        {% elif bruker %}
+        {% elif current_user.is_authenticated %}
         <span class="handlinger">
             <button type="button" data-handling="svar">Svar</button>
-            {% if h.bruker_id == bruker.id %}
+            {% if h.bruker_id == current_user.id %}
             <button type="button" data-handling="rediger">Rediger</button>
             <button type="button" data-handling="slett">Slett</button>
             {% endif %}

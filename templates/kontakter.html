@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block tittel %}Kontakter &middot; Jan Nazar Havdal{% endblock %}
+{% block overskrift %}Kontakter{% endblock %}
+
+{% block innhold %}
+
+<section>
+
+    {% if current_user.is_authenticated %}
+    <p class="skjemalenker"><a href="/kontakter/ny">Ny kontakt</a></p>
+    {% endif %}
+
+    {% if kontakter %}
+    <ol class="logg kontaktliste">
+        {% for k in kontakter %}
+        <li>
+            <div class="innhold">
+                <span class="tekst">{{ k.fornavn }} {{ k.etternavn }}</span>
+                <span class="handlinger">
+                    <a href="/kontakter/{{ k.id }}">Detaljer</a>
+                    {% if current_user.is_authenticated %}
+                    <a href="/kontakter/{{ k.id }}/endre">Endre</a>
+                    <form method="post" action="/kontakter/{{ k.id }}/slett"
+                        data-bekreft="Slette {{ k.fornavn }} {{ k.etternavn }}?">
+                        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+                        <button type="submit" class="lenkeknapp">Slett</button>
+                    </form>
+                    {% endif %}
+                </span>
+            </div>
+            <span class="tid">{{ k.by }}</span>
+        </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p class="tom">Ingen kontakter enda.</p>
+    {% endif %}
+
+</section>
+
+{% endblock %}

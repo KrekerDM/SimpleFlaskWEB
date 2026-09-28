@@ -13,6 +13,8 @@ SPORRING = """
     LEFT JOIN brukere b ON b.id = h.bruker_id
 """
 
+KONTAKTFELT = ('fornavn', 'etternavn', 'by', 'epost', 'telefon')
+
 
 def koble():
     kobling = sqlite3.connect(DATABASE)
@@ -38,6 +40,18 @@ def lag_tabell():
             brukernavn TEXT NOT NULL UNIQUE,
             salt TEXT NOT NULL,
             passord TEXT NOT NULL,
+            laget TEXT NOT NULL
+        )
+    """)
+    kobling.execute("""
+        CREATE TABLE IF NOT EXISTS kontakter (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fornavn TEXT NOT NULL,
+            etternavn TEXT NOT NULL,
+            by TEXT NOT NULL,
+            epost TEXT NOT NULL,
+            telefon TEXT NOT NULL,
+            bilde TEXT,
             laget TEXT NOT NULL
         )
     """)
@@ -72,7 +86,10 @@ def hent_alle():
 
 
 def hent_en(kobling, hilsen_id):
-    rad = kobling.execute(SPORRING + 'WHERE h.id = ?', (hilsen_id,)).fetchone()
+    try:
+        rad = kobling.execute(SPORRING + 'WHERE h.id = ?', (hilsen_id,)).fetchone()
+    except OverflowError:
+        return None
     return lag_hilsen(rad) if rad else None
 
 
@@ -93,16 +110,24 @@ def endre_tekst(kobling, hilsen_id, tekst):
     kobling.commit()
 
 
-def slett_traad(kobling, hilsen_id):
+def slett_traad(kobling, hilsen_id, bruker_id):
     ider = [hilsen_id]
     for forelder in ider:
         for rad in kobling.execute('SELECT id FROM hilsener WHERE svar_til = ?', (forelder,)):
             ider.append(rad['id'])
 
     plasser = ','.join('?' for _ in ider)
-    kobling.execute(f'DELETE FROM hilsener WHERE id IN ({plasser})', ider)
-    kobling.commit()
-    return ider
+    egne = [rad['id'] for rad in kobling.execute(
+        f'SELECT id FROM hilsener WHERE id IN ({plasser}) AND bruker_id = ?', ider + [bruker_id]
+    )]
+
+    if egne:
+        egne_plasser = ','.join('?' for _ in egne)
+        kobling.execute(f'UPDATE hilsener SET svar_til = NULL WHERE svar_til IN ({egne_plasser})', egne)
+        kobling.execute(f'DELETE FROM hilsener WHERE id IN ({egne_plasser})', egne)
+        kobling.commit()
+
+    return egne
 
 
 def tell(kobling):
@@ -112,3 +137,59 @@ def tell(kobling):
 def sok_i_hilsener(sokeord):
     sokeord = sokeord.lower()
     return [h for h in hent_alle() if sokeord in h['tekst'].lower()]
+
+
+def hent_kontakter():
+    kobling = koble()
+    rader = kobling.execute(
+        'SELECT * FROM kontakter ORDER BY etternavn COLLATE NOCASE, fornavn COLLATE NOCASE'
+    ).fetchall()
+    kobling.close()
+    return [dict(rad) for rad in rader]
+
+
+def hent_kontakt(kontakt_id):
+    kobling = koble()
+    try:
+        rad = kobling.execute('SELECT * FROM kontakter WHERE id = ?', (kontakt_id,)).fetchone()
+    except OverflowError:
+        rad = None
+    kobling.close()
+    return dict(rad) if rad else None
+
+
+def lagre_kontakt(felter, bilde):
+    kobling = koble()
+    markor = kobling.execute(
+        'INSERT INTO kontakter (fornavn, etternavn, by, epost, telefon, bilde, laget)'
+        ' VALUES (?, ?, ?, ?, ?, ?, ?)',
+        tuple(felter[navn] for navn in KONTAKTFELT) + (bilde, naa()),
+    )
+    kobling.commit()
+    kobling.close()
+    return markor.lastrowid
+
+
+def endre_kontakt(kontakt_id, felter):
+    kobling = koble()
+    kobling.execute(
+        'UPDATE kontakter SET fornavn = ?, etternavn = ?, by = ?, epost = ?, telefon = ?'
+        ' WHERE id = ?',
+        tuple(felter[navn] for navn in KONTAKTFELT) + (kontakt_id,),
+    )
+    kobling.commit()
+    kobling.close()
+
+
+def sett_bilde(kontakt_id, filnavn):
+    kobling = koble()
+    kobling.execute('UPDATE kontakter SET bilde = ? WHERE id = ?', (filnavn, kontakt_id))
+    kobling.commit()
+    kobling.close()
+
+
+def slett_kontakt(kontakt_id):
+    kobling = koble()
+    kobling.execute('DELETE FROM kontakter WHERE id = ?', (kontakt_id,))
+    kobling.commit()
+    kobling.close()
